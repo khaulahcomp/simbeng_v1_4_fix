@@ -1,0 +1,31 @@
+{
+  "summary": "Full backend + frontend regression testing done for the 3 reported bugs (pencarian sparepart online, urutan Kode—Nama di faktur, quick-add kode part di kasir) plus regresi diskon/merge/stok/draf. Semua bug LULUS. Backend endpoints AJAX ok, frontend flow di POS dan Receipt sesuai spesifikasi.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_results": {
+    "BUG1_pencarian_online": "PASS - GET /ajax/lookup_hsc.php?field=auto&q=oli => HTTP 200, source=live, offline=false, 60 hasil, kedua sumber hadir {hsc,hcg}. Di UI: 0 pesan 'Gagal memuat', 60 result items, chips terlihat: 'Semua Sumber 60', 'HargaSukuCadang 25', 'HondaCengkareng 35'. Badge HSC=27, HCG=37.",
+    "BUG2_urutan_kode_nama_faktur": "PASS - Faktur id=1 menampilkan item dgn format 'AHM-001 — Oli Mesin MPX' dan 'AHM-002 — Kampas Rem' (KODE dulu, lalu nama). Urutan: Jasa (Tune Up) → part per kode. Diskon menampilkan persen (10%, 5%).",
+    "BUG3a_AHM-001": "PASS - Input 'AHM-001' Enter -> baris otomatis masuk, msg 'Ditambahkan: AHM-001 - Oli Mesin MPX'.",
+    "BUG3b_AHM-009_trailing_space": "PASS - Kode 'AHM-009 ' (spasi di belakang di DB) tetap terbaca; baris masuk, msg 'Ditambahkan: AHM-009 - Filter Udara Vario'.",
+    "BUG3c_AHM-00_prefix_multi": "PASS - 3 kandidat muncul di pos-quickadd-suggest (visible), msg text-warning 'Kode AHM-00 cocok dengan 3 sparepart — pilih dari daftar.' Klik saran valid (merge behaviour untuk kandidat yg sudah ada).",
+    "BUG3d_ngawur": "PASS - 'XXX999ZZ' -> msg 'Sparepart dengan kode/barcode XXX999ZZ tidak ditemukan.'",
+    "REGRESI_merge": "PASS - AHM-001 kedua kali: rows stay=2, qty 2->3 (accumulate).",
+    "REGRESI_diskon_default": "PASS - value='persen'.",
+    "REGRESI_qty_over_stok": "PASS - qty=99>stok5: stok-warning visible, pos-submit disabled.",
+    "REGRESI_draf_otomatis": "PASS - draft-status shows 'Draf tersimpan otomatis HH.MM.SS'."
+  },
+  "test_report_links": ["/tmp/login_and_test.sh"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "CSP masih memblok cloudflareinsights beacon.min.js (harmless console noise, konsisten dgn iteration_1).",
+    "Kode 'AHM-009 ' disimpan dengan trailing space di DB — meskipun cariPart sudah toleran, sebaiknya normalisasi kode saat INSERT/UPDATE untuk menghindari masalah di masa depan."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "admin / admin123",
+  "seed_data_creation": "none (menggunakan data existing)",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Semua endpoint AJAX yang diuji: /ajax/lookup_hsc.php (200, kedua sumber live), /ajax/lookup.php?action=part_by_code&code=AHM-001 (200), &code=AHM-009 (200 dgn trailing space), &action=search_parts&q=AHM-00 (3 rows), &q=XXX999ZZ ([]). POS quickadd via data-testid=pos-quickadd-input + Enter berfungsi utuh. Login memerlukan csrf_token dari GET login form.",
+  "rca of the issue": "Tidak ada bug tersisa. Semua fix di ajax/lookup_hsc.php (mbstring polyfill + DOMDocument guard), pages/receipt.php (format 'KODE — Nama'), dan pages/pos.php (cariPart toleran + showQuickAddSuggest) bekerja seperti yang dispesifikasikan."
+}

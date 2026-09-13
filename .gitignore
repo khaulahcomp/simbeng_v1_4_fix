@@ -83,10 +83,15 @@ android-sdk/
 
 # overlay black-box crash/user-report dumps — session data, never history
 **/.emergent/recordings/
-simbeng/.mariadb_test/ib_logfile0
+# Data runtime MariaDB & file hasil runtime aplikasi (tidak untuk repo)
+/.mariadb_data/
+/logs/
+/storage/
+/uploads/
 .env
 .env.*
 *.env
 credentials.json
 *.key
 .credentials
+.mariadb_data/ib_logfile0
