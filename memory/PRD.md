@@ -43,6 +43,14 @@ Melanjutkan project repo public https://github.com/khaulahcomp/simbeng_v1_4_fix 
 - Solusi: `sudo supervisorctl stop frontend`, PHP server dipindah ke `0.0.0.0:3000` (docroot `/app/simbeng/bengkel`); MariaDB test di `/app/simbeng/.mariadb_test` (dump + seed uji). Path diperbarui di `bengkel/start_preview.sh` dan `start_mariadb.sh`.
 - Preview publik https://simbeng-kasir-fix.preview.emergentagent.com kini menyajikan aplikasi PHP bengkel; seluruh fitur (merge item, tanda merah stok + tombol simpan terkunci, default diskon persen, draf otomatis, urutan faktur per kode, diskon % di faktur, tombol WA+gambar) diverifikasi ulang lewat URL publik — SEMUA LULUS.
 
+## Update 2026-09-13 (sesi 3) — Perbaikan 3 Bug Laporan User
+1. **Pencarian katalog online (hargasukucadang.online & hondacengkareng.com) error "Gagal memuat hasil"**: akar masalah = HTTP 500 karena ekstensi PHP mbstring/dom/curl tidak tersedia. Fix: polyfill `mb_strlen` di `includes/db.php` (dimuat semua endpoint), guard `class_exists('DOMDocument')` di `hsc_parse` (ajax/lookup_hsc.php) & `hsc_sync_parse` (includes/sync_hsc.php), pesan error frontend lebih informatif (HTTP status/exception) di `pages/parts.php`.
+2. **Format nama item faktur**: kini "KODE — Nama Part" (kode dulu) di `pages/receipt.php`, termasuk rincian teks WhatsApp ("KODE - Nama").
+3. **Kode part kasir "Tidak ditemukan" padahal stok ada**: fungsi baru `cariPart()` di `pages/pos.php` — exact kode/barcode → pencarian prefix → pencocokan toleran spasi/kapital (kode tersimpan beda spasi tetap terbaca); bila beberapa kandidat cocok, tampilkan daftar saran (showQuickAddSuggest) alih-alih "tidak ditemukan".
+- Verifikasi: testing_agent iteration_2 — SEMUA PASS (100% backend & frontend), termasuk regresi merge item, diskon persen default, tanda merah stok + tombol simpan terkunci, draf otomatis. Laporan: /app/simbeng/test_reports/iteration_2.json.
+- Catatan testing agent (saran non-blokir): normalisasi/TRIM kode part saat INSERT/UPDATE untuk mencegah kode dengan spasi tersembunyi.
+
 ## Backlog
 - P1: Uji kirim WA di perangkat HP produksi (share sheet dengan lampiran).
 - P2: Draf tersimpan di server (per-user) agar lintas perangkat — saat ini localStorage per perangkat/browser.
+- P2: Normalisasi TRIM kode part saat simpan data sparepart.
