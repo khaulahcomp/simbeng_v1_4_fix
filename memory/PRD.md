@@ -50,6 +50,13 @@ Melanjutkan project repo public https://github.com/khaulahcomp/simbeng_v1_4_fix 
 - Verifikasi: testing_agent iteration_2 — SEMUA PASS (100% backend & frontend), termasuk regresi merge item, diskon persen default, tanda merah stok + tombol simpan terkunci, draf otomatis. Laporan: /app/simbeng/test_reports/iteration_2.json.
 - Catatan testing agent (saran non-blokir): normalisasi/TRIM kode part saat INSERT/UPDATE untuk mencegah kode dengan spasi tersembunyi.
 
+## Update 2026-09-13 (sesi 4) — Restrukturisasi Repo GitHub
+- Masalah user: repo GitHub berubah jadi template JavaScript (backend/frontend Emergent), kode PHP hilang; aplikasi produksi sebenarnya PHP murni (https://simbeng.ptkhaulah.com/, admin/admin123).
+- Akar masalah: platform menyinkronkan isi `/app` ke GitHub; `/app` berisi template + folder `simbeng` yang tercatat sebagai gitlink rusak (menunjuk commit lama 8b7cede), sehingga kode PHP tidak masuk repo.
+- Solusi: isi aplikasi PHP (`/app/simbeng/bengkel/`) dipindah ke root `/app` (index.php, pages/, includes/, ajax/, .htaccess, .user.ini, dll.); template JS (backend/frontend/tests) dibackup ke `/root/emergent_template_backup/`; gitlink `simbeng` dihapus dari index; datadir MariaDB → `/app/.mariadb_data`; `start_preview.sh` docroot `/app`; `start_mariadb.sh` DATADIR `/app/.mariadb_data`; `.gitignore` mengabaikan `/.mariadb_data/ /logs/ /storage/ /uploads/ *.log`. Commit di repo lokal `/app` (branch main, HEAD: 51ebe1c + commit gitignore log).
+- Verifikasi: testing_agent iteration_3 — SEMUA PASS 100% (struktur, kasir, faktur, katalog online, AJAX). Laporan: /app/test_reports/iteration_3.json.
+- TINDAKAN USER: tekan tombol push/sync GitHub di UI Emergent agar repo https://github.com/khaulahcomp/simbeng_v1_4_fix berisi struktur PHP yang baru. Untuk cPanel: upload seluruh isi repo (kecuali folder yang di-gitignore) ke public_html — struktur kini identik dengan model produksi.
+
 ## Backlog
 - P1: Uji kirim WA di perangkat HP produksi (share sheet dengan lampiran).
 - P2: Draf tersimpan di server (per-user) agar lintas perangkat — saat ini localStorage per perangkat/browser.

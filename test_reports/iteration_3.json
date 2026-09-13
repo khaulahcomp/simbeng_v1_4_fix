@@ -1,0 +1,26 @@
+{
+  "summary": "Regression testing after docroot restructure (dari /app/simbeng/bengkel/ menjadi root /app). Semua fitur & endpoint yang divalidasi lulus - tidak ada path relatif rusak. Docroot baru /app dilayani PHP built-in server pada port 3000/8090; MariaDB via socket berjalan normal setelah datadir dipindah ke /app/.mariadb_data.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_results": {
+    "REGRESI_struktur": "PASS - GET /index.php -> 302 -> ?page=login (HTTP 200). Login admin/admin123 -> 302 lalu dashboard <title>Dashboard - Bengkel Motor</title> HTTP 200.",
+    "REGRESI_kasir": "PASS - POS memuat #pos-quickadd-input, select customer 'Budi Test (085624938087)' berhasil, quick-add 'AHM-001'+Enter menambah baris ('Ditambahkan: AHM-001 - Oli Mesin MPX'), ulang -> merge menjadi 1 baris qty=2. Set qty=99>stok5 => [data-testid=stok-warning] visible=True, [data-testid=pos-submit] disabled=True. [data-testid=diskon-jenis] default value='persen'. Draft-status muncul 'Draf tersimpan otomatis 08.30.44' (terlihat di screenshot POS).",
+    "REGRESI_faktur": "PASS - /index.php?page=receipt&id=1 HTTP 200. Cell nama item render 'AHM-001 — Oli Mesin MPX' dan 'AHM-002 — Kampas Rem' (KODE dulu, em-dash). Baris 'Diskon Nota (10%)' hadir. [data-testid=wa-btn] hadir (1). Urutan jasa (Tune Up) dulu, part per kode.",
+    "REGRESI_katalog_online": "PASS - /index.php?page=parts, isi #hscQuery='oli' -> 60 hasil, chips 'Semua Sumber 60', 'HargaSukuCadang 25', 'HondaCengkareng 35'. Body: HSC=26 occurences, HCG=36 occurences. 'Gagal memuat' TIDAK muncul di panel hasil.",
+    "REGRESI_backend_ajax": "PASS - GET /ajax/lookup.php?action=part_by_code&code=AHM-001 -> HTTP 200 JSON {id:1,kode:AHM-001,nama:Oli Mesin MPX,stok:5,harga_jual:40000.00}. GET /ajax/lookup_hsc.php?field=auto&q=busi -> HTTP 200 JSON results[] dgn sumber 'hcg' & 'hsc' hadir."
+  },
+  "test_report_links": ["/tmp/regress.sh"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "CSP masih memblokir cloudflareinsights beacon.min.js (harmless, sama seperti iterasi sebelumnya).",
+    "Restrukturisasi docroot bersih: tidak ada path relatif (ajax/, includes/, uploads/) yang rusak. index.php, pages/*.php, ajax/*.php semua accessible di root."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "admin / admin123",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Docroot sekarang /app. PHP server 3000 (publik) & 8090 (lokal). MariaDB datadir /app/.mariadb_data socket /run/mysqld/mysqld.sock db bengkel. Login flow butuh csrf_token dari GET /index.php?page=login. Semua fitur (merge, diskon persen default, stok-warning, draft-status, KODE—Nama faktur, katalog HSC/HCG, WA btn) intact.",
+  "rca of the issue": "Tidak ada bug. Restrukturisasi lokasi file dari /app/simbeng/bengkel -> /app tidak merusak fitur apapun karena path aplikasi memakai relative includes (require __DIR__ . '/includes/...') dan URL AJAX relative ('ajax/lookup.php'). start_preview.sh & start_mariadb.sh sudah diperbarui dan services running."
+}
