@@ -38,6 +38,11 @@ Melanjutkan project repo public https://github.com/khaulahcomp/simbeng_v1_4_fix 
 - Fitur lampir gambar WA otomatis butuh HTTPS (cPanel SSL) dan browser HP (Chrome/Safari) — di desktop otomatis fallback unduh+chat.
 - Kredensial uji lokal: admin / admin123 (default aplikasi).
 
+## Update 2026-09-13 (sesi 2) — Perbaikan Preview Emergent
+- Masalah user: preview "open new tab" menampilkan template React bawaan (port 3000 = node), sehingga aplikasi PHP tidak terlihat dan dikira struktur datanya salah. Remote repo dicek IDENTIK dengan dasar clone; perubahan hanya di 4 file (pos.php, receipt.php, schema.php, db.php).
+- Solusi: `sudo supervisorctl stop frontend`, PHP server dipindah ke `0.0.0.0:3000` (docroot `/app/simbeng/bengkel`); MariaDB test di `/app/simbeng/.mariadb_test` (dump + seed uji). Path diperbarui di `bengkel/start_preview.sh` dan `start_mariadb.sh`.
+- Preview publik https://simbeng-kasir-fix.preview.emergentagent.com kini menyajikan aplikasi PHP bengkel; seluruh fitur (merge item, tanda merah stok + tombol simpan terkunci, default diskon persen, draf otomatis, urutan faktur per kode, diskon % di faktur, tombol WA+gambar) diverifikasi ulang lewat URL publik — SEMUA LULUS.
+
 ## Backlog
 - P1: Uji kirim WA di perangkat HP produksi (share sheet dengan lampiran).
 - P2: Draf tersimpan di server (per-user) agar lintas perangkat — saat ini localStorage per perangkat/browser.
