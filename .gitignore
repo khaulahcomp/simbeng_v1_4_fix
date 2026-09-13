@@ -95,3 +95,4 @@ credentials.json
 *.key
 .credentials
 .mariadb_data/ib_logfile0
+*.log
